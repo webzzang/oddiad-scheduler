@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    hikari:
+      username: ODDI_APP
+      password: "app21_oddiXX"
+      pool-name: oddiad-pool
+      max-lifetime: 12000
+      connection-test-query: select now()
+      minimum-idle: 2
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: "jdbc:mysql://rds-an2-oddiad-stg-mysql.ca3pv7invojs.ap-northeast-2.rds.amazonaws.com:3310/oddi?characterEncoding=utf8&useSSL=false"
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+      use-new-id-generator-mappings: false
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults=false: false
+      globally_quoted_identifiers: true
+logging:
+  config: classpath:logback-file.xml
+
+
+notification:
+  sender-phone: "01051227638"
+
+oddi:
+  user-web-host: "https://stg.oddiad.co.kr"
+  manager-web-host: "https://portal.stg.oddiad.co.kr"
+  user-web-voc-detail: "/inquire"
+
+aws:
+  s3:
+    public:
+      bucket: "s3-an2-oddiad-stg"
+      video-dir: "/adv/pre-convert"
+      url-host: "https://resource.stg.oddiad.co.kr/"
+      region: ap-northeast-2
+  media:
+    host: "https://resource.stg.oddiad.co.kr/adv/converted/"
+    role-arn: "arn:aws:iam::734578097671:role/service-role/MediaConvert_Default_Role"
+    file-out-dir: "/adv/converted"
+    end-point: "https://bnklbqvoa.mediaconvert.ap-northeast-2.amazonaws.com"
+    region: ap-northeast-2
+
+
+
+device-api: "https://device.stg.oddiad.co.kr/"
+
+

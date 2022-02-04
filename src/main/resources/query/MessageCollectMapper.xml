@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exflyer.oddiad.scheduler.task.repository.MessageCollectMapper">
+  <update id="updateCreateDone">
+    update notification_group set target_create_done = true
+    where target_group_seq > 0 and target_create_done = false
+  </update>
+  <select id="findTarget" resultType="com.exflyer.oddiad.scheduler.task.dto.NotificationCollectDto">
+    <![CDATA[
+    select ng.*, ntg.target_code
+    from notification_group ng,
+    notification_target_group ntg
+    where ng.target_group_seq = ntg.seq
+      and ng.target_group_seq > 0
+      and ng.target_create_done = false
+    ]]>
+  </select>
+  <select id="findAllMemberByAdvAccept"
+    resultType="com.exflyer.oddiad.scheduler.task.dto.NotificationTargetDto">
+    select m.id, m.name, m.phone_number from member m, member_terms mt
+    where m.id = mt.member_id
+      and m.receive_consent = true
+    <if test="advMessage">
+      and mt.terms_seq in (select seq from terms
+                           where status_code = 'TST002'
+                             and adv_terms = false)
+    </if>
+    group by m.phone_number
+  </select>
+  <select id="findAllAdvertisersByAdvAccept"
+    resultType="com.exflyer.oddiad.scheduler.task.dto.NotificationTargetDto">
+    select m.id, m.name, m.phone_number from member m, member_terms mt, adv a
+    where m.id = mt.member_id
+      and m.id = a.member_id
+      and m.receive_consent = true
+    <if test="advMessage">
+      and mt.terms_seq in (select seq from terms
+      where status_code = 'TST002'
+      and adv_terms = false)
+    </if>
+    group by m.phone_number
+  </select>
+  <select id="findAllAdverByAdvAcceptAndChannelType"
+    resultType="com.exflyer.oddiad.scheduler.task.dto.NotificationTargetDto">
+    select m.id, m.name, m.phone_number from member m, member_terms mt, adv a
+    where m.id = mt.member_id
+      and m.id = a.member_id
+      and m.receive_consent = true
+      and a.channel_type = #{channelType}
+    <if test="advMessage">
+      and mt.terms_seq in (select seq from terms
+        where status_code = 'TST002'
+        and adv_terms = false)
+    </if>
+    group by m.phone_number
+  </select>
+  <select id="findByNotificationTarget"
+    resultType="com.exflyer.oddiad.scheduler.task.dto.NotificationTargetDto">
+    select nt.member_id as id, nt.name, nt.phone_number from notification_target nt
+    where nt.target_group_seq = #{targetGroupSeq}
+  </select>
+</mapper>

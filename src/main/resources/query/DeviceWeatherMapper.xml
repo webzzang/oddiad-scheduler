@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exflyer.oddiad.scheduler.task.repository.DeviceWeatherMapper">
+  <select id="findWeather" resultType="com.exflyer.oddiad.scheduler.task.model.DeviceWeather">
+    select pd.device_id,
+           concat(p.addr_si, ' ', p.addr_gu, ' ', p.addr_dong) as addr,
+           p.addr                                              as origin_addr,
+           p.addr_si                                           as sido,
+           w.tmp,
+           w.tmn,
+           IFNULL(w.tmx, (select max(wh.tmx) from weather wh where wh.grid_x = p.grid_x and wh.grid_y = p.grid_y)) as tmx,
+           w.pop,
+           w.reh,
+           ''                                                  as pm10,
+           ''                                                  as pm10_grade,
+           ''                                                  as pm25,
+           ''                                                  as pm25_grade,
+           w.wsd,
+           w.weather_code                                      as sky,
+           w.weather_icon                                      as icon
+    from partner_device pd,
+         partner p,
+         weather w
+    where pd.partner_seq = p.seq
+      and p.grid_x = w.grid_x
+      and p.grid_y = w.grid_y
+      and fcst_date = #{searchDate}
+      and fcst_time = #{searchTime}
+    group by device_id
+  </select>
+  <select id="findWeatherByDeviceId" resultType="com.exflyer.oddiad.scheduler.task.model.DeviceWeather">
+    select pd.device_id,
+           concat(p.addr_si, ' ', p.addr_gu, ' ', p.addr_dong) as addr,
+           p.addr                                              as origin_addr,
+           p.addr_si                                           as sido,
+           w.tmp,
+           w.tmn,
+           IFNULL(w.tmx, (select max(wh.tmx) from weather wh where wh.grid_x = p.grid_x and wh.grid_y = p.grid_y)) as tmx,
+           w.pop,
+           w.reh,
+           ''                                                  as pm10,
+           ''                                                  as pm10_grade,
+           ''                                                  as pm25,
+           ''                                                  as pm25_grade,
+           w.wsd,
+           w.weather_code                                      as sky,
+           w.weather_icon                                      as icon
+    from partner_device pd,
+         partner p,
+         weather w
+    where pd.partner_seq = p.seq
+      and p.grid_x = w.grid_x
+      and p.grid_y = w.grid_y
+    <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(deviceId)">
+      and pd.device_id = #{deviceId}
+    </if>
+      and fcst_date = #{searchDate}
+      and fcst_time = #{searchTime}
+    group by device_id
+  </select>
+</mapper>

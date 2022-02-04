@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exflyer.oddiad.scheduler.task.repository.BroadcastingMapper">
+  <select id="findBroadcastingDevice" resultType="com.exflyer.oddiad.scheduler.task.dto.BroadcastingDevice">
+    select ad.seq                                                                           as adv_seq,
+           pt.seq                                                                           as partner_seq,
+           ptd.device_id,
+           ptd.display_div,
+           ptd.side_contents_type,
+           ptd.bottom_contents_type,
+           case
+               when (select type from adv_file adf where adf.adv_seq = ad.seq limit 1) = 'AFT002'
+                   then 'video'
+               else 'image'
+               end                                                                          as contents_type,
+           (select slot_video_time from partner_config pc where pc.type = 'PTT001' limit 1) as slot_video_time
+    from adv ad,
+         adv_partner adpt,
+         partner pt,
+         partner_device ptd
+    where ad.seq = adpt.adv_seq
+      and pt.seq = adpt.partner_seq
+      and pt.seq = ptd.partner_seq
+      and pt.operation = true
+      and adpt.expo = true
+      and ad.channel_type = 'PTT001' /* 오디존 */
+      and ad.progress_code = 'PGT002' /* 결제 완료  */
+      and ad.audit_code = 'ADT002' /* 승인 */
+      and #{targetDay} between ad.start_date and ad.end_date /* 취합 날짜(yyyyMMdd) */
+    <if test="partnerSeq != null and partnerSeq > 0">
+      and pt.seq = #{partnerSeq} /* 승인 */
+    </if>
+    <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(deviceId)">
+      and ptd.device_id = #{deviceId}
+    </if>
+    order by partner_seq, device_id, adpt.view_order
+  </select>
+  <select id="findDeviceIdByPartnerSeq" resultType="java.lang.String">
+    select device_id from broadcasting
+    where partner_seq = #{partnerSeq}
+      and expo = true
+    group by device_id
+  </select>
+  <select id="findDefaultAdvDevice" resultType="com.exflyer.oddiad.scheduler.task.dto.BroadcastingDevice">
+    select
+      pt.seq                                                                           as partner_seq,
+      ptd.device_id,
+      ptd.display_div,
+      ptd.side_contents_type,
+      ptd.bottom_contents_type,
+      (select slot_video_time from partner_config pc where pc.type = 'PTT001' limit 1) as slot_video_time
+    from
+      partner pt,
+      partner_device ptd,
+      partner_default_adv pda
+    where pt.seq = ptd.partner_seq
+      and pt.operation = true
+      and pda.partner_seq = pt.seq
+      and pda.expo = true
+  </select>
+  <select id="findDevice" resultType="java.lang.String">
+    select device_id from broadcasting group by device_id
+  </select>
+  <select id="findBroadcastingNewMappingDeviceForDefaultAd"
+    resultType="com.exflyer.oddiad.scheduler.task.dto.BroadcastingDevice">
+    select 0                                                                                as adv_seq,
+           pt.seq                                                                           as partner_seq,
+           ptd.device_id,
+           ptd.display_div,
+           ptd.side_contents_type,
+           ptd.bottom_contents_type,
+           (select slot_video_time from partner_config pc where pc.type = 'PTT001' limit 1) as slot_video_time
+    from partner pt,
+      partner_device ptd
+    where pt.seq = ptd.partner_seq
+      and ptd.device_id not in (
+      select device_id
+      from broadcasting
+      group by device_id
+      )
+  </select>
+</mapper>

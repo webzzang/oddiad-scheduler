@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exflyer.oddiad.scheduler.task.repository.MediaConvertMapper">
+  <select id="findTarget" resultType="com.exflyer.oddiad.scheduler.task.dto.MediaConvertTarget">
+    select adf.adv_seq, adf.file_seq, f.s3_file_key, f.path
+    from adv a,
+         adv_file adf,
+         files f
+    where a.seq = adf.adv_seq
+      and adf.file_seq = f.seq
+      and a.channel_type = 'PTT001'
+      and a.progress_code = 'PGT002'
+      and a.audit_code = 'ADT002'
+      and adf.type = 'AFT002'
+      and f.converted = false
+      and f.converted_path is null
+  </select>
+</mapper>

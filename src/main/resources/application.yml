@@ -1,0 +1,47 @@
+server:
+  port: 28080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+  shutdown: graceful
+spring:
+  profiles:
+    active: local
+
+schedule:
+  message:
+    sleep-member: "0 0 10 * * *"
+    adv-end: "0 0 11 * * *"
+    withdrawal-member: "0 0 14 * * *"
+  account:
+    sleep-member: "0 0 1 * * *"
+    withdrawal-member: "0 0 2 * * *"
+  media:
+    convert: "0 0 2 * * *"
+  adv:
+    broadcasting: "0 0 3 * * *"
+    history: "0 0 1 * * *"
+  promotion:
+    expiredDate: "0 0 1 * * *"
+
+# timezone
+timezone: "Asia/Seoul"
+
+weather:
+  weather-dfs: "https://www.kma.go.kr/wid/queryDFS.jsp"
+  open-api-host: "http://apis.data.go.kr"
+  weather-api-path : "/1360000/VilageFcstInfoService_2.0/getVilageFcst"
+  air-api-path : "/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty"
+  serviceKey : "gX0oJ/zMtiNo+Scf3eWdZTw0T+eBscPR1X7EFxaB0MeFBy1xwLh57TZ8C24gLn9PBSBs5mfsYMVM9GngzHGRBg=="
+  apiKey : "gX0oJ/zMtiNo+Scf3eWdZTw0T+eBscPR1X7EFxaB0MeFBy1xwLh57TZ8C24gLn9PBSBs5mfsYMVM9GngzHGRBg=="
+
+kakao:
+  local-host: "https://dapi.kakao.com/v2/local/search/address.json"
+  rest-key: "d62c6d25963f8c03257cbdce11f000e7"
+
+
+youtube:
+  apiUrl: "https://www.googleapis.com/youtube/v3/search"
+  apiKey: AIzaSyAZ5lcwihajWuvw2zMMR24B6n2ukFdPNjQ

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exflyer.oddiad.scheduler.task.repository.DeviceStatMapper">
+
+  <select id="findDeviceState" resultType="com.exflyer.oddiad.scheduler.task.dto.DeviceStat">
+    select t.*
+      from (
+            select ds.device_id
+                  , p.mall_name
+                  , d.name as device_name
+                  , ds.mod_date
+                  , TIMESTAMPDIFF(MINUTE, ds.mod_date, #{nowDate}) as mod_date_add
+                  , c.code
+                  , ds.device_state
+                  , c.using_type
+                  , c.name
+                  , (select name from code cc where c.using_type = cc.code) as device_level_name
+              from device_state ds
+              inner join partner_device d on ds.device_id = d.device_id
+              inner join partner p on p.seq = d.partner_seq
+              inner join code c on ds.device_state = c.val and c.group_code = 'DSL'
+            )t
+  </select>
+
+  <select id="findManagerGroup" resultType="com.exflyer.oddiad.scheduler.task.dto.ManagerGroup">
+    select mn.role_seq
+          , id as manager_id
+          , m.name as manager_name
+          , m.phone_number
+          , r.name
+          , mn.device_state_code
+          , (select name from code c where c.group_code = 'DDT' and c.code = mn.device_state_code) as code_name
+          , mn.manager_push
+          , mn.reg_date
+          , TIMESTAMPDIFF(HOUR , mn.reg_date, #{nowDate}) as reg_date_add
+      from manager_notification mn
+      inner join (select mr.manager_id, mr.role_seq, name
+                     from role inner join manager_role mr on seq = mr.role_seq and usable = true
+                  ) r on r.role_seq = mn.role_seq
+      left join manager m on r.role_seq = m.role_seq and m.state = #{state}
+      where mn.device_push = true
+      and mn.device_state_code = #{deviceStateCode}
+  </select>
+
+</mapper>

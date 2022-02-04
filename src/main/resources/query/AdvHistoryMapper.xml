@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exflyer.oddiad.scheduler.task.repository.AdvHistoryMapper">
+
+  <select id="findByAdvStartList" resultType="com.exflyer.oddiad.scheduler.task.model.AdvHistory">
+    select a.seq as advSeq, a.channel_type
+          , ap.partner_seq
+          , a.member_id
+          , di.device_id
+          , di.device_model as device_name
+          , a.start_date as adv_start_date
+          , a.end_date as adv_end_date
+      from adv a
+             inner join adv_partner ap on a.seq = ap.adv_seq
+             inner join partner p on ap.partner_seq = p.seq
+             inner join partner_device pd on p.seq = pd.partner_seq
+             inner join device_info di on di.device_id = pd.device_id
+      where start_date = #{startDate}
+        and audit_code =  #{auditCode}
+        and progress_code =  #{progressCode}
+  </select>
+
+</mapper>

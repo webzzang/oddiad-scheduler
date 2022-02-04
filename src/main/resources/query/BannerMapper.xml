@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exflyer.oddiad.scheduler.task.repository.BannerMapper">
+
+  <select id="findExpoBanner" resultType="com.exflyer.oddiad.scheduler.task.dto.ExpoBanner">
+    select b.seq as banner_seq,
+           case
+             when b.location_code = 'BLT003' then 'side'
+             else 'bottom' end as location_code,
+           f.path
+    from banner b,
+         files f
+    where b.file_seq = f.seq
+      and b.usable = true
+      and #{targetDay} between expo_start_date and expo_end_date
+      and b.location_code in (
+                              'BLT003',
+                              'BLT002'
+      )
+    order by location_code
+  </select>
+</mapper>

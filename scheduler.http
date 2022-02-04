@@ -1,0 +1,8 @@
+### Send POST request with json body
+POST https://device.oddiad.co.kr/devicePush
+Content-Type: application/json
+
+{
+  "device_id": "zbypxe",
+  "action": "request_main_ad"
+}
